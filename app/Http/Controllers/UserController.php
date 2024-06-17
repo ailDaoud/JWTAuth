@@ -12,7 +12,7 @@ class UserController extends Controller
   /*  public function register(Request $request){
     $data =$request->all();
     }*/
-    function register(Request $request)
+   public function register(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -43,5 +43,47 @@ class UserController extends Controller
                 'Exceptions'=>$e
             ],200);
         }
+    }
+    function registerr(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                "email" => 'required|email|unique:users,email',
+                'name' => 'required|string|min:2',
+                "password" => "string|required|min:6|confirmed"
+            ]);
+
+
+            $user =new User;
+            $user->email=$request->email;
+            $user->name=$request->name;
+            $user->password=Hash::make($request['password']);
+            $user->save();
+
+
+
+            if ($user) {
+                return $this->responseWithToken(auth()->login($user), $user);
+            } else {
+                return response()->json([
+                    'status' => 'failed',
+                    'message' => 'An error occure while trying to create user'
+                ], 200);
+            }
+        } catch (Exception $e) {
+            return response()->json([
+                'status'=>'failed',
+                'validator errors'=>$validator->errors(),
+                'Exceptions'=>$e
+            ],200);
+        }
+    }
+    function responseWithToken($token, $user)
+    {
+        return response()->json([
+            'status' => 'success',
+            'user' => $user,
+            'access_token' => $token
+        ],200);
     }
 }

@@ -10,6 +10,6 @@ Route::get('/user', function (Request $request) {
 
 
 Route::group(['middleware'=>'api'],function($routes){
-Route::post('/registerr',[UserController::class,'register']);
+Route::post('/register',[UserController::class,'register'])->name('register');
 });
 
